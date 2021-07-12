@@ -5,7 +5,6 @@ from . import models
 
 @admin.register(models.RoomType, models.Facility, models.Amenity, models.HouseRule)
 class ItemAdmin(admin.ModelAdmin):
-
     """ Item Admin Definition """
 
     list_display = ("name", "used_by")
@@ -17,13 +16,11 @@ class ItemAdmin(admin.ModelAdmin):
 
 
 class PhotoInline(admin.TabularInline):
-
     model = models.Photo
 
 
 @admin.register(models.Room)
 class RoomAdmin(admin.ModelAdmin):
-
     """ Room Admin Definition """
 
     inlines = (PhotoInline,)
@@ -43,13 +40,45 @@ class RoomAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Times", {"fields": ("check_in", "check_out", "instant_book")}),
-        ("Spaces", {"fields": ("guests", "beds", "bedrooms", "baths")}),
+        (
+            "Times",
+            {"fields":
+                (
+                    "check_in",
+                    "check_out",
+                    "instant_book"
+                )
+            }
+        ),
+        (
+            "Spaces",
+            {"fields":
+                (
+                    "guests",
+                    "beds",
+                    "bedrooms",
+                    "baths"
+                )
+            }
+        ),
         (
             "More About the Space",
-            {"fields": ("amenities", "facilities", "house_rules")},
+            {
+                "fields": (
+                    "amenities",
+                    "facilities",
+                    "house_rules"
+                )
+            },
         ),
-        ("Last Details", {"fields": ("host",)}),
+        (
+            "Last Details",
+            {
+                "fields": (
+                    "host",
+                )
+            }
+        ),
     )
 
     list_display = (
@@ -92,10 +121,11 @@ class RoomAdmin(admin.ModelAdmin):
     def count_photos(self, obj):
         return obj.photos.count()
 
+    count_photos.short_description = 'Photo Count'
+
 
 @admin.register(models.Photo)
 class PhotoAdmin(admin.ModelAdmin):
-
     """ Phot Admin Definition """
 
     list_display = ("__str__", "get_thumbnail")
