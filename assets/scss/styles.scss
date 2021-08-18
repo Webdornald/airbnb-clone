@@ -6,13 +6,18 @@
 }
 
 .nav_link {
-  @apply border-b-2 border-white h-full flex items-center;
+  @apply border-b-2 border-white h-full flex items-center hover:border-gray-600;
   a {
     @apply py-10 px-5;
   }
-  &:hover {
-    @apply border-gray-600;
-  }
+}
+
+.btn {
+  @apply text-center rounded-sm py-5 font-light text-lg w-full;
+}
+
+input {
+  @apply rounded-sm py-5 font-light text-lg w-full text-left border border-gray-400 px-5 focus:outline-none focus:border-blue-500;
 }
 
 @tailwind utilities;
