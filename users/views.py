@@ -56,15 +56,10 @@ class SignUpView(FormView):
     template_name = 'users/signup.html'
     form_class = forms.SignUpForm
     success_url = reverse_lazy('core:home')
-    initial = {
-        'first_name': 'jaeseong',
-        'last_name': 'kim',
-        'email': 'webdornald@naver.com',
-    }
 
     def form_valid(self, form):
         form.save()
-        email = form.cleaned_data.get('username')  # ModelForm 사용시 'username'을 'email'로 바꿔야 한다.
+        email = form.cleaned_data.get('email')  # ModelForm 사용시 'username'을 'email'로 바꿔야 한다.
         password = form.cleaned_data.get('password1')
         user = authenticate(self.request, username=email, password=password)
         if user is not None:
