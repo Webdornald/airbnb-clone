@@ -16,6 +16,10 @@
   @apply text-center rounded-sm py-5 font-light text-lg w-full;
 }
 
+.btn-link {
+  @apply text-center py-3 rounded-lg font-light text-lg w-full text-white bg-red-500;
+}
+
 input {
   @apply rounded-sm py-5 font-light text-lg w-full text-left border border-gray-400 px-5 focus:outline-none focus:border-blue-500;
 }
@@ -28,6 +32,45 @@ form {
         @apply bg-red-200 border-gray-400 focus:border-gray-600;
       }
     }
+  }
+}
+
+@keyframes messageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  5% {
+    opacity: 1;
+    transform: translateY(20px);
+  }
+  95% {
+    opacity: 1;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+.message {
+  animation: messageFadeIn 3.5s ease-in-out forwards;
+
+  &.error {
+    @apply bg-red-600;
+  }
+
+  &.info {
+    @apply bg-blue-500;
+  }
+
+  &.success {
+    @apply bg-green-500;
+  }
+
+  &.warning {
+    @apply bg-yellow-400;
   }
 }
 
