@@ -31,11 +31,11 @@ class User(AbstractUser):
 
     CURRENCY_CHOICES = ((CURRENCY_USD, "USD"), (CURRENCY_KRW, "KRW"))
 
-    LOGIN_EMAIL = 'eamil'
+    LOGIN_EMAIL = 'email'
     LOGIN_GITHUB = 'github'
     LOGIN_KAKAO = 'kakao'
 
-    LOGIN_CHOICES = ((LOGIN_EMAIL, 'Email'), (LOGIN_GITHUB, 'Github'), (LOGIN_KAKAO, 'Kako'))
+    LOGIN_CHOICES = ((LOGIN_EMAIL, 'Email'), (LOGIN_GITHUB, 'Github'), (LOGIN_KAKAO, 'Kakao'))
 
     avatar = models.ImageField(upload_to="avatars", blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)

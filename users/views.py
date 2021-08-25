@@ -1,9 +1,10 @@
 import os
 import requests
+from django.contrib.auth.views import PasswordChangeView
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import FormView, DetailView
+from django.views.generic import FormView, DetailView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
 from django.contrib import messages
@@ -86,7 +87,8 @@ def complete_verification(request, key):
 def github_login(request):
     client_id = os.environ.get('GITHUB_ID')
     redirect_uri = 'http://127.0.0.1:8000/users/login/github/callback'
-    return redirect(f'https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=read:user')
+    return redirect(
+        f'https://github.com/login/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&scope=read:user')
 
 
 class GithubException(Exception):
@@ -99,9 +101,11 @@ def github_callback(request):
         client_secret = os.environ.get('GITHUB_SECRET')
         code = request.GET.get('code', None)
         if code is not None:
-            token_request = requests.post(f'https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}', headers={
-                "Accept": 'application/json'
-            })
+            token_request = requests.post(
+                f'https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}',
+                headers={
+                    "Accept": 'application/json'
+                })
             token_json = token_request.json()
             error = token_json.get('error', None)
             if error is not None:
@@ -152,7 +156,8 @@ def github_callback(request):
 def kakao_login(request):
     REST_API_KEY = os.environ.get('KAKAO_ID')
     REDIRECT_URI = 'http://127.0.0.1:8000/users/login/kakao/callback'
-    return redirect(f'https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code')
+    return redirect(
+        f'https://kauth.kakao.com/oauth/authorize?client_id={REST_API_KEY}&redirect_uri={REDIRECT_URI}&response_type=code')
 
 
 class KakaoException(Exception):
@@ -164,13 +169,15 @@ def kakao_callback(request):
         code = request.GET.get('code')
         client_id = os.environ.get('KAKAO_ID')
         redirect_uri = 'http://127.0.0.1:8000/users/login/kakao/callback'
-        token_request = requests.get(f'https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}')
+        token_request = requests.get(
+            f'https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id={client_id}&redirect_uri={redirect_uri}&code={code}')
         token_json = token_request.json()
         error = token_json.get('error', None)
         if error is not None:
             raise KakaoException("Can't get authorization code.")
         access_token = token_json.get('access_token')
-        profile_request = requests.get('https://kapi.kakao.com/v2/user/me', headers={'Authorization': f'Bearer {access_token}'})
+        profile_request = requests.get('https://kapi.kakao.com/v2/user/me',
+                                       headers={'Authorization': f'Bearer {access_token}'})
         profile_json = profile_request.json()
         email = profile_json.get('kakao_account').get('email')
         if email is None:
@@ -207,7 +214,48 @@ class UserProfileView(DetailView):
     model = models.User
     context_object_name = 'user_obj'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['hello'] = 'Hello'
-        return context
+
+class UpdateProfileView(UpdateView):
+    model = models.User
+    template_name = 'users/update_profile.html'
+    fields = (
+        "first_name",
+        "last_name",
+        "gender",
+        "bio",
+        "birthdate",
+        "language",
+        "currency",
+    )
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    # 만약 email을 변경할 수 있다면 거기에 맞춰 username을 변경한다.(validate 테스트는?)
+    # def form_valid(self, form):
+    #     email = form.clean_data.get('email')
+    #     self.object.username = email
+    #     self.object.save()
+    #     return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['first_name'].widget.attrs = {'placeholder': 'first_name'}
+        form.fields['last_name'].widget.attrs = {'placeholder': 'last_name'}
+        form.fields['gender'].widget.attrs = {'placeholder': 'gender'}
+        form.fields['bio'].widget.attrs = {'placeholder': 'bio'}
+        form.fields['birthdate'].widget.attrs = {'placeholder': 'birthdate'}
+        form.fields['language'].widget.attrs = {'placeholder': 'language'}
+        form.fields['currency'].widget.attrs = {'placeholder': 'currency'}
+        return form
+
+
+class UpdatePasswordView(PasswordChangeView):
+    template_name = 'users/update_password.html'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['old_password'].widget.attrs = {'placeholder': 'Current password'}
+        form.fields['new_password1'].widget.attrs = {'placeholder': 'New password'}
+        form.fields['new_password2'].widget.attrs = {'placeholder': 'Confirm password'}
+        return form
