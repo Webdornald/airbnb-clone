@@ -10,8 +10,7 @@
     <div class="container xl:1/4 lg:w-1/4 md:w-1/2 mx-auto my-10 flex flex-col items-center border p-6 border-gray-400">
         {% include 'mixins/auth/auth_form.html' with form=form cta='Update Profile' %}
 
-        {{ object.login_method }}
-        {% if object.login_method == 'email' %}
+        {% if object.login_method == 'email' or object.login_method == 'eamil' %}
             <div class="mt-5">
                 <a href="{% url 'users:password' %}" class="text-teal-500 font-medium">Change Password</a>
             </div>
